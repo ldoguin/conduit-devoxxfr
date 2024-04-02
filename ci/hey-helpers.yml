@@ -1,0 +1,22 @@
+# -----------------------------
+#  🛠️ Hey Helpers
+# -----------------------------
+
+.install-hey: 
+  before_script: |
+    echo "🤖 Installing hey dependencies... ⏳"
+    sudo apt-get update
+    sudo apt-get -y install hey
+    echo "🤖 Hey installed 🎉"
+
+.hey-run: 
+  script: |
+    echo "🚀 Running test ..." 
+    echo "API root ${API_ROOT}"
+    hey -n 300 -c 100 -m GET \
+    "${API_ROOT}" > benchmark.txt
+    cat benchmark.txt
+
+
+
+

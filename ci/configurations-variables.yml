@@ -1,0 +1,24 @@
+  # -----------------------------
+  #  📝 Configuration
+  # -----------------------------
+.configuration:
+  variables:
+    DOCKER_REGISTRY: https://index.docker.io/v1/
+    APPLICATION_NAME: realworld-app-demo
+    # Qovery
+    QOVERY_CLI_VERSION: 0.57.1
+    QOVERY_ORGANIZATION: QoveryDevoxxDemo # 👋 update here
+    QOVERY_PROJECT: CouchBaseProject # 👋 update here
+    QOVERY_ENVIRONMENT: couchbase_env # 👋 update here
+    # Kaniko
+    JSON_CONFIG: |
+      {
+        "auths": {
+          "$DOCKER_REGISTRY": {
+            "username": "$DOCKER_REGISTRY_USER",
+            "password": "$DOCKER_REGISTRY_PASSWORD"
+          }
+        }
+      }
+
+

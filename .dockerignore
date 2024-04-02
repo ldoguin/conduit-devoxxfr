@@ -1,0 +1,7 @@
+node_modules
+env
+ci/*
+.gitlab-ci.yml
+.gitpod.Dockerfile
+.gitpod.yml
+docker-compose.yml

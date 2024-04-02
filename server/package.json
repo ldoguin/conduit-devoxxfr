@@ -1,0 +1,42 @@
+{
+  "name": "realworld-node-express-mongodb-javascript",
+  "version": "1.0.0",
+  "description": "realWorld Project",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js",
+    "dev": "nodemon server",
+    "test": "jest --verbose --forceExit --detectOpenHandles",
+    "start:coverage": "nyc --silent node api/index.js",
+    "lint": "eslint ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-async-handler": "^1.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "ottoman": "^2.3.3",
+    "slugify": "^1.6.5"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "nodemon": "^2.0.20"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "./__test__/jest.setup.js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "dist/"
+    ],
+    "testTimeout": 10000
+  }
+}

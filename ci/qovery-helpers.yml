@@ -1,0 +1,91 @@
+# -----------------------------
+#  🛠️ Helpers
+# -----------------------------
+
+.qovery_tools: 
+  script: |
+    function set_env() {
+      echo "🟠 remove $1"
+      ./qovery container env delete \
+            --key "$1" \
+            --organization ${QOVERY_ORGANIZATION} \
+            --project ${QOVERY_PROJECT} \
+            --environment ${CURRENT_QOVERY_ENVIRONMENT} \
+            --container ${APPLICATION_NAME} || true
+
+      echo "🟣 create $1 $2"
+      ./qovery container env create \
+            --key "$1" \
+            --value "$2" \
+            --scope "ENVIRONMENT" \
+            --organization ${QOVERY_ORGANIZATION} \
+            --project ${QOVERY_PROJECT} \
+            --environment ${CURRENT_QOVERY_ENVIRONMENT} \
+            --container ${APPLICATION_NAME}
+    }
+
+
+# Install Qovery CLI and dependencies
+.install-qovery-cli: 
+  before_script: |
+    echo "🤖 Installing wget... ⏳"
+    apt-get update
+    apt-get install wget -y
+    echo "🤖 Installing Qovery CLI... ⏳"
+    wget https://github.com/Qovery/qovery-cli/releases/download/v${QOVERY_CLI_VERSION}/qovery-cli_${QOVERY_CLI_VERSION}_linux_amd64.tar.gz
+    tar xvf qovery-cli_${QOVERY_CLI_VERSION}_linux_amd64.tar.gz
+    echo "🤖 Qovery CLI installed 🎉"
+
+.deploy-container: 
+  script: |
+    echo "🚀 deploying application..." 
+    echo "organization ${QOVERY_ORGANIZATION}"
+    echo "project ${QOVERY_PROJECT}"
+    echo "environment ${CURRENT_QOVERY_ENVIRONMENT}"
+    echo "container ${APPLICATION_NAME}"
+    echo "tag ${DOCKER_IMAGE_TAG}"
+    ./qovery container deploy \
+      --organization ${QOVERY_ORGANIZATION} \
+      --project ${QOVERY_PROJECT} \
+      --environment ${CURRENT_QOVERY_ENVIRONMENT} \
+      --container ${APPLICATION_NAME} \
+      --tag ${DOCKER_IMAGE_TAG} \
+      --watch
+
+.update-environment-url: 
+  script: |
+    echo "🌍 building url..." 
+    LINE=$(./qovery container domain list -n ${APPLICATION_NAME} \
+      --organization ${QOVERY_ORGANIZATION} \
+      --project ${QOVERY_PROJECT} \
+      --environment ${CURRENT_QOVERY_ENVIRONMENT} | tail -n +2)
+    LINE=$(echo "${LINE}" | grep -o -P '(?<=\|).*(?=\|)')
+    
+    var1=${LINE#?????????}
+    var2=${var1%???????????}
+
+    DYNAMIC_ENVIRONMENT_URL="https://${var2}"
+    echo "DYNAMIC_ENVIRONMENT_URL=${DYNAMIC_ENVIRONMENT_URL}" >> deploy.env
+    cat deploy.env
+    echo $pwd
+
+.clone-environment-if-not-exists-and-mr:
+  script: |
+    if [ -n "$CI_MERGE_REQUEST_IID" ]
+    then
+      echo "🤖 cloning environment..."    
+      ./qovery environment clone \
+        --organization ${QOVERY_ORGANIZATION} \
+        --project ${QOVERY_PROJECT} \
+        --environment ${QOVERY_ENVIRONMENT} \
+        --new-environment-name ${CURRENT_QOVERY_ENVIRONMENT} || true
+    fi
+
+.remove-environment:
+  script: |
+    echo "🤚 deleting environment..."
+    ./qovery environment delete \
+      --organization ${QOVERY_ORGANIZATION} \
+      --project ${QOVERY_PROJECT} \
+      --environment ${QOVERY_ENVIRONMENT}-${CI_COMMIT_REF_NAME} \
+      --watch

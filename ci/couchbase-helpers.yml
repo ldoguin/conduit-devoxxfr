@@ -1,0 +1,24 @@
+# -----------------------------
+#  🛠️ Couchbase Helpers
+# -----------------------------
+
+# Create a Couchbase scope
+.create-scope: 
+  script: |
+    echo "Resolve DNS"
+    DOMAIN=`dig _couchbases._tcp.$DB_HOST SRV +short  | awk '{print $4}' | rev | cut -c2- | rev`
+    echo "Resolved:"
+    echo $DOMAIN
+    echo "🌍 creating scope..." 
+    curl -X POST -v -u $DB_USERNAME:$DB_PASSWORD https://$DOMAIN:18091/pools/default/buckets/$DB_BUCKET/scopes  -d name=$DB_SCOPE --insecure
+
+
+# Drop a Couchbase scope
+.drop-scope: 
+  script: |
+    echo "Resolve DNS"
+    DOMAIN=`dig _couchbases._tcp.$DB_HOST SRV +short  | awk '{print $4}' | rev | cut -c2- | rev`
+    echo "Resolved:"
+    echo $DOMAIN
+    echo "🤚 deleting scope..."
+    curl -X DELETE -v -u $DB_USERNAME:$DB_PASSWORD https://$DOMAIN:18091/pools/default/buckets/$DB_BUCKET/scopes/$DB_SCOPE --insecure

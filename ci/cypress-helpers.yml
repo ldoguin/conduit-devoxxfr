@@ -1,0 +1,24 @@
+# -----------------------------
+#  🛠️ Cypress Helpers
+# -----------------------------
+
+# Install Cypress and dependencies
+.install-cypress: 
+  before_script: |
+    echo "🤖 Installing cypress dependencies... ⏳"
+    sudo apt-get update
+    DEBIAN_FRONTEND=noninteractive \
+    sudo apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
+
+    echo "🤖 Installing Cypress... ⏳"
+    npm -g install cypress
+    echo "🤖 Cypress installed 🎉"
+
+.cypress-run: 
+  script: |
+    echo "🚀 Running test ..." 
+    echo "API root ${API_ROOT}"
+    echo "Scope ${DB_SCOPE}"
+    npm install
+    cypress run -s cypress/e2e/comments-spec.js --headless --reporter junit
+    

@@ -1,0 +1,39 @@
+image: laurentdoguin/gitpod-workspace-java-couchbase
+
+tasks:
+  - name: Install dependencies
+    init: |
+      sudo rm -rf ~/.npm/ && npm install && gp sync-done installdep && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+  - name : Import Couchbase sample bucket
+    command: |
+      gp await-port 8091
+      CB_SAMPLES='["travel-sample"]' /scripts/import-sample-buckets.sh
+  - name: Start Couchbase Server
+    command: |
+      sudo runsvdir -P /etc/service
+  - name: Start Server
+    init: gp sync-await installdep
+    command: |
+      gp await-port 8091
+      npm run dev
+
+ports:
+  - port: 8090-21300
+    onOpen: ignore
+  - port: 8080
+    visibility: public
+  - port: 3000
+    visibility: public
+  - port: 5000
+    visibility: public
+  - port: 7070
+    visibility: public
+  - port: 8091
+    visibility: public
+  - port: 4369
+    onOpen: ignore
+
+vscode:
+  extensions:
+    - dbaeumer.vscode-eslint
+    - couchbase.vscode-couchbase
